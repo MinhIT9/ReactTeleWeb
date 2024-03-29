@@ -13,12 +13,18 @@ function SendMessageForm() {
     event.preventDefault();
     setIsLoading(true);
     try {
-      await apiService.sendMessageToTelegramChannel(channelId, cleanMessage(message), 'HTML');
+      await apiService.sendMessageToTelegramChannel(
+        channelId,
+        cleanMessage(message),
+        "HTML"
+      );
       alert("Message sent successfully to Telegram Channel!");
       setMessage(""); // Reset state
       setChannelId("");
     } catch (error) {
-      alert("Failed to send message to Telegram Channel: " + error.message);
+      alert(
+        "Failed to send message to Telegram Channel: " + error.message
+      );
     } finally {
       setIsLoading(false);
     }
@@ -42,33 +48,41 @@ function SendMessageForm() {
 
   const cleanMessage = (html) => {
     return html.replace(/<\/?p[^>]*>/g, "");
-  };  
+  };
 
   return (
     <form onSubmit={handleSendMessage}>
-    <div className="mb-3">
-      <label htmlFor="channelId" className="form-label">
-        Channel ID:
-      </label>
-      <input
-        type="text"
-        className="form-control"
-        id="channelId"
-        value={channelId}
-        onChange={(e) => setChannelId(e.target.value)}
-        required
-      />
-    </div>
-    <div className="mb-3">
-      <label htmlFor="message" className="form-label">
-        Message:
-      </label>
-      <ReactQuill value={message} onChange={setMessage} modules={modules} />
-    </div>
-    <button type="submit" className="btn btn-primary" disabled={isLoading}>
-      {isLoading ? "Sending..." : "Send Message"}
-    </button>
-  </form>
+      <div className="mb-3">
+        <label htmlFor="channelId" className="form-label">
+          Channel ID:
+        </label>
+        <input
+          type="text"
+          className="form-control"
+          id="channelId"
+          value={channelId}
+          onChange={(e) => setChannelId(e.target.value)}
+          required
+        />
+      </div>
+      <div className="mb-3">
+        <label htmlFor="message" className="form-label">
+          Message:
+        </label>
+        <ReactQuill
+          value={message}
+          onChange={setMessage}
+          modules={modules}
+        />
+      </div>
+      <button
+        type="submit"
+        className="btn btn-primary"
+        disabled={isLoading}
+      >
+        {isLoading ? "Sending..." : "Send Message"}
+      </button>
+    </form>
   );
 }
 
