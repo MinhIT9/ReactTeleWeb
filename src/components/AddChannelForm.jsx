@@ -1,16 +1,20 @@
 // AddChannelForm.jsx
-import { useState } from 'react';
-import axios from 'axios';
+import { useState } from "react";
+import { apiService } from '../services/apiService';
+import useChannels from '../hooks/useFetchChannels';
+
 
 function AddChannelForm() {
     const [channelName, setChannelName] = useState('');
+    const { setChannels } = useChannels(); // Sử dụng custom hook
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            await axios.post('https://your-mock-api-url/channels', { name: channelName });
+            const newChannel = await apiService.addChannel({ channel_name: channelName });
+            setChannels(prevChannels => [...prevChannels, newChannel]);
             setChannelName(''); // Reset input after submission
-            // Optionally refresh channel list or show success message
         } catch (error) {
             console.error("Error adding channel:", error);
         }
