@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { apiService } from '../services/apiService';
 
-function useFetchChannels() {
+export function useFetchChannels() {
   const [channels, setChannels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -12,6 +12,7 @@ function useFetchChannels() {
       setLoading(true);
       try {
         const data = await apiService.getChannels();
+        // console.log("data_ChannelsAPI: ", data);
         setChannels(data);
       } catch (err) {
         setError(err);
@@ -23,7 +24,10 @@ function useFetchChannels() {
     fetchChannels();
   }, []);
 
+  // Log để kiểm tra
+  // console.log('Channels from hook:', channels);
+  // console.log('Loading status:', loading);
+  // console.log('Error:', error);
+
   return { channels, loading, error };
 }
-
-export default useFetchChannels;

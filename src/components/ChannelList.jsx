@@ -1,6 +1,6 @@
 // src/components/ChannelList.jsx
 import { apiService } from "../services/apiService"; // Đúng cách import
-import { useChannels } from "../Contexts/ChannelsContext";
+import { useChannels } from "../hooks/useChannels";
 
 function ChannelList() {
   const { channels, setChannels } = useChannels();
@@ -14,17 +14,18 @@ function ChannelList() {
   const handleDelete = async (channelId) => {
     try {
       await apiService.deleteChannel(channelId);
-      setChannels(prevChannels => prevChannels.filter(channel => channel.id !== channelId)); // Cập nhật state
+      setChannels(prevChannels => prevChannels.filter(channel => channel.id !== channelId));
     } catch (error) {
       console.error("Error deleting channel:", error);
     }
   };
 
+  // console.log("ChannelList: ", channels);
   return (
     <ul>
       {channels.map((channel) => (
         <li key={channel.id}>
-          {channel.channel_name}
+          Number: {channel.channel_number}, ID: {channel.channel_id}, Name: {channel.channel_name}
           <button onClick={() => handleEdit(channel.id)}>Edit</button>
           <button onClick={() => handleDelete(channel.id)}>Delete</button>
         </li>

@@ -1,7 +1,7 @@
 // AddChannelForm.jsx
 import { useState } from "react";
 import { apiService } from '../services/apiService';
-import useChannels from '../hooks/useFetchChannels';
+import { useChannels } from "../hooks/useChannels";
 
 
 function AddChannelForm() {

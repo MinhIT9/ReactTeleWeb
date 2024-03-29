@@ -18,9 +18,9 @@ function SendMessageForm() {
         cleanMessage(message),
         "HTML"
       );
-      alert("Message sent successfully to Telegram Channel!");
-      setMessage(""); // Reset state
-      setChannelId("");
+      // alert("Message sent successfully to Telegram Channel!");
+      // setMessage(""); // Reset state
+      // setChannelId("");
     } catch (error) {
       alert(
         "Failed to send message to Telegram Channel: " + error.message
@@ -47,9 +47,18 @@ function SendMessageForm() {
   };
 
   const cleanMessage = (html) => {
-    return html.replace(/<\/?p[^>]*>/g, "");
+    // Thay thế các thẻ <br> bằng newline
+    let cleanHtml = html.replace(/<br\s*[/]?>/gi, '');
+    // Thay thế các thẻ <p> bằng newline và xóa các thẻ </p>
+    cleanHtml = cleanHtml.replace(/<p>/gi, '\n').replace(/<\/p>/gi, '');
+    // Cắt khoảng trắng thừa ở đầu và cuối chuỗi
+    cleanHtml = cleanHtml.trim();
+    return cleanHtml;
   };
-
+  
+  
+  
+  
   return (
     <form onSubmit={handleSendMessage}>
       <div className="mb-3">
