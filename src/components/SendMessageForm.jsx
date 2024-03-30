@@ -6,7 +6,7 @@ import { apiService } from "../services/apiService"; // Đúng cách import
 
 function SendMessageForm() {
   const [message, setMessage] = useState(""); // Nên giữ tên biến này là message để khớp với state
-  const [channelId, setChannelId] = useState("");
+  const [channelIds, setChannelIds] = useState([]); // Sửa đổi state này để lưu trữ mảng các ID
   const [isLoading, setIsLoading] = useState(false);
   const [mediaFiles, setMediaFiles] = useState([]); // Lưu trữ mảng các file media
 
@@ -15,49 +15,61 @@ function SendMessageForm() {
   const handleSendMessage = async (event) => {
     event.preventDefault();
     setIsLoading(true);
+    let successfulSends = [];
+    let failedSends = [];
 
-    if (mediaFiles && mediaFiles.length > 0) {
-      // Xử lý gửi tin nhắn có kèm theo media
-      const formData = new FormData();
-      formData.append('chat_id', channelId);
-      const mediaData = mediaFiles.map((file, index) => ({
-        type: file.type.startsWith('image/') ? 'photo' : 'video',
-        media: 'attach://' + file.name,
-        caption: index === 0 ? cleanMessage(message) : undefined
-      }));
-      formData.append('media', JSON.stringify(mediaData));
-      mediaFiles.forEach((file) => {
-        formData.append(file.name, file);
-      });
 
-      try {
-        const response = await apiService.sendMediaGroupToTelegramChannel(
-          channelId,
-          mediaFiles, // Đảm bảo rằng đây là một mảng các file
-          cleanMessage(message)
-        );
-        console.log(response);
-        alert("Media sent successfully!");
-      } catch (error) {
-        console.error(error);
-        alert("Failed to send media: " + error.message);
+    for (let id of channelIds) {
+      if (mediaFiles && mediaFiles.length > 0) {
+        // Xử lý gửi tin nhắn có kèm theo media
+        const formData = new FormData();
+        formData.append('chat_id', id);
+        const mediaData = mediaFiles.map((file, index) => ({
+          type: file.type.startsWith('image/') ? 'photo' : 'video',
+          media: 'attach://' + file.name,
+          caption: index === 0 ? cleanMessage(message) : undefined
+        }));
+        formData.append('media', JSON.stringify(mediaData));
+        mediaFiles.forEach((file) => {
+          formData.append(file.name, file);
+        });
+
+        try {
+          const response = await apiService.sendMediaGroupToTelegramChannel(
+            id,
+            mediaFiles, // Đảm bảo rằng đây là một mảng các file
+            cleanMessage(message)
+          );
+          console.log(response);
+          // alert("Media sent successfully!");
+        } catch (error) {
+          console.error(error);
+          alert("Failed to send media: " + error.message);
+        }
+      } else {
+        // Thêm phần này để xử lý gửi tin nhắn văn bản khi không có media files
+        try {
+          // Gửi tin nhắn văn bản và đợi kết quả
+          await apiService.sendMessageToTelegramChannel(
+            id,
+            cleanMessage(message),
+            'HTML' // Hoặc 'Markdown'
+          );
+          successfulSends.push(id); // Thêm vào danh sách thành công
+          // alert("Message sent successfully!");
+        } catch (error) {
+          console.error(`Failed to send message to channel ${id}:`, error);
+          failedSends.push(id); // Thêm vào danh sách thất bại
+        }
       }
-    } else {
+    }
 
-      // Thêm phần này để xử lý gửi tin nhắn văn bản khi không có media files
-      try {
-        const response = await apiService.sendMessageToTelegramChannel(
-          channelId,
-          cleanMessage(message),
-          'HTML' // Hoặc 'Markdown' tùy vào cách bạn muốn format tin nhắn
-        );
-        console.log(response);
-        alert("Message sent successfully!");
-      } catch (error) {
-        console.error(error);
-        alert("Failed to send message: " + error.message);
-      }
-
+    // Cung cấp thông tin phản hồi cho người dùng
+    if (successfulSends.length > 0) {
+      alert(`Message sent successfully to channels: ${successfulSends.join(', ')}`);
+    }
+    if (failedSends.length > 0) {
+      alert(`Failed to send message to channels: ${failedSends.join(', ')}`);
     }
 
     // Reset trạng thái
@@ -101,15 +113,15 @@ function SendMessageForm() {
   return (
     <form onSubmit={handleSendMessage}>
       <div className="mb-3">
-        <label htmlFor="channelId" className="form-label">
-          Channel ID:
+        <label htmlFor="channelIds" className="form-label">
+          Channel IDs (separate by commas):
         </label>
         <input
           type="text"
           className="form-control"
-          id="channelId"
-          value={channelId}
-          onChange={(e) => setChannelId(e.target.value)}
+          id="channelIds"
+          value={channelIds.join(', ')} // Thay đổi cách hiển thị value
+          onChange={(e) => setChannelIds(e.target.value.split(',').map(id => id.trim()))} // Thay đổi cách set giá trị
           required
         />
       </div>
