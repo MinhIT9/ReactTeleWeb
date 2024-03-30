@@ -24,10 +24,5 @@ export function useFetchChannels() {
     fetchChannels();
   }, []);
 
-  // Log để kiểm tra
-  // console.log('Channels from hook:', channels);
-  // console.log('Loading status:', loading);
-  // console.log('Error:', error);
-
   return { channels, loading, error };
 }

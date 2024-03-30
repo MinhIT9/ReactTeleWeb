@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 // src/components/SendMessForm.jsx
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import CSS cho giao diện snow của Quill
-import { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import { apiService } from "../services/apiService"; // Đúng cách import
 
 function SendMessageForm() {
@@ -9,62 +10,94 @@ function SendMessageForm() {
   const [channelId, setChannelId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mediaFiles, setMediaFiles] = useState([]); // Lưu trữ mảng các file media
+  const [channels, setChannels] = useState([]);
+  const [selectedChannels, setSelectedChannels] = useState([]);
+
+
+
+  const handleChannelSelectionChange = (e) => {
+    // Lấy tất cả các option được chọn và trích xuất giá trị của chúng
+    const selectedOptions = Array.from(e.target.options).filter(option => option.selected);
+    const selectedValues = selectedOptions.map(option => option.value);
+    setSelectedChannels(selectedValues);
+    console.log('ChannelValueSelected:',  selectedValues);
+    // console.log('ChannelsValue:', channels);
+  };
+
+  useEffect(() => {
+    // Log ra console để kiểm tra
+    // console.log('Channels:', channels);
+
+    // Bạn cũng có thể gọi API tại đây để lấy channels nếu chúng chưa có sẵn
+    const fetchChannels = async () => {
+      try {
+        const data = await apiService.getChannels();
+        setChannels(data);
+        // console.log('Fetched Channels:', data);
+      } catch (error) {
+        console.error('Error fetching channels:', error);
+      }
+    };
+
+    // Nếu channels chưa có sẵn, thì gọi hàm fetchChannels
+    if (channels.length === 0) {
+      fetchChannels();
+    }
+  }, []);
 
 
   // Trong SendMessageForm, khi chuẩn bị dữ liệu để gửi
   const handleSendMessage = async (event) => {
     event.preventDefault();
     setIsLoading(true);
+    const promises = [];
 
-    if (mediaFiles && mediaFiles.length > 0) {
-      // Xử lý gửi tin nhắn có kèm theo media
-      const formData = new FormData();
-      formData.append('chat_id', channelId);
-      const mediaData = mediaFiles.map((file, index) => ({
-        type: file.type.startsWith('image/') ? 'photo' : 'video',
-        media: 'attach://' + file.name,
-        caption: index === 0 ? cleanMessage(message) : undefined
-      }));
-      formData.append('media', JSON.stringify(mediaData));
-      mediaFiles.forEach((file) => {
-        formData.append(file.name, file);
-      });
+    for (const channelId of selectedChannels) {
+      if (mediaFiles.length > 0) {
+        // Xử lý gửi tin nhắn có kèm theo media
+        const formData = new FormData();
+        formData.append('chat_id', channelId);
+        const mediaData = mediaFiles.map((file, index) => ({
+          type: file.type.startsWith('image/') ? 'photo' : 'video',
+          media: 'attach://' + file.name,
+          caption: index === 0 ? cleanMessage(message) : undefined
+        }));
+        formData.append('media', JSON.stringify(mediaData));
+        mediaFiles.forEach((file) => {
+          formData.append(file.name, file);
+        });
 
-      try {
-        const response = await apiService.sendMediaGroupToTelegramChannel(
+        // Đẩy promise vào mảng promises mà không chờ đợi ở đây
+        promises.push(apiService.sendMediaGroupToTelegramChannel(
           channelId,
-          mediaFiles, // Đảm bảo rằng đây là một mảng các file
-          cleanMessage(message)
-        );
-        console.log(response);
-        alert("Media sent successfully!");
-      } catch (error) {
-        console.error(error);
-        alert("Failed to send media: " + error.message);
-      }
-    } else {
+          formData
+        ));
 
-      // Thêm phần này để xử lý gửi tin nhắn văn bản khi không có media files
-      try {
-        const response = await apiService.sendMessageToTelegramChannel(
+      } else {
+        // Đẩy promise gửi tin nhắn văn bản vào mảng promises
+        promises.push(apiService.sendMessageToTelegramChannel(
           channelId,
           cleanMessage(message),
-          'HTML' // Hoặc 'Markdown' tùy vào cách bạn muốn format tin nhắn
-        );
-        console.log(response);
-        alert("Message sent successfully!");
-      } catch (error) {
-        console.error(error);
-        alert("Failed to send message: " + error.message);
+          'HTML'
+        ));
       }
-
     }
 
-    // Reset trạng thái
-    // setMessage("");
-    // setChannelId("");
-    setMediaFiles([]);
-    setIsLoading(false);
+    try {
+      // Chờ tất cả promises hoàn thành
+      const responses = await Promise.all(promises);
+      console.log(responses);
+      alert("Tin nhắn đã được gửi thành công đến tất cả các kênh đã chọn!");
+    } catch (error) {
+      console.error("Có lỗi khi gửi tin nhắn: ", error);
+      alert("Không thể gửi tin nhắn. Lỗi: " + error.message);
+    } finally {
+      // Reset trạng thái sau khi gửi tin
+      setMessage("");
+      setMediaFiles([]);
+      setSelectedChannels([]); // Đảm bảo cũng reset lựa chọn kênh
+      setIsLoading(false);
+    }
   };
 
 
@@ -73,17 +106,8 @@ function SendMessageForm() {
 
   const modules = {
     toolbar: [
-      [{ header: "1" }, { header: "2" }, { font: [] }],
-      [{ size: [] }],
       ["bold", "italic", "underline", "strike", "blockquote"],
-      [
-        { list: "ordered" },
-        { list: "bullet" },
-        { indent: "-1" },
-        { indent: "+1" },
-      ],
-      ["link", "image", "video"],
-      ["clean"],
+      ["link"],
     ],
   };
 
@@ -102,16 +126,22 @@ function SendMessageForm() {
     <form onSubmit={handleSendMessage}>
       <div className="mb-3">
         <label htmlFor="channelId" className="form-label">
-          Channel ID:
+          Select Channel(s):
         </label>
-        <input
-          type="text"
-          className="form-control"
+        <select
+          className="form-select"
           id="channelId"
-          value={channelId}
-          onChange={(e) => setChannelId(e.target.value)}
-          required
-        />
+          value={selectedChannels}
+          onChange={handleChannelSelectionChange}
+          multiple
+        >
+          {channels.map((channel) => (
+            <option key={channel.channel_id} value={channel.channel_id}>
+              {`${channel.channel_name} (ID: ${channel.channel_id})`}
+            </option>
+          ))}
+
+        </select>
       </div>
       <div className="mb-3">
         <label htmlFor="media" className="form-label">

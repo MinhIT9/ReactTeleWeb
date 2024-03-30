@@ -17,44 +17,61 @@ export const apiService = {
     sendMediaGroupToTelegramChannel: async (channelId, mediaArray, caption = '') => {
         const formData = new FormData();
         formData.append('chat_id', channelId);
-    
-        // Tạo một mảng chứa các đối tượng media với caption cho media đầu tiên
+
+        // Tạo mảng các đối tượng media để gửi đi
         const mediaData = mediaArray.map((file, index) => ({
             type: file.type.startsWith('image/') ? 'photo' : 'video',
             media: 'attach://' + file.name,
-            // Chỉ đính kèm caption cho media đầu tiên
             caption: index === 0 ? caption : undefined,
-            parse_mode: 'HTML' // Hoặc Markdown, tùy thuộc vào định dạng của bạn
         }));
-    
-        // Thêm dữ liệu media vào formData
+        // Chú ý: Không chuyển đổi cả mảng mediaData thành chuỗi JSON trước khi thêm vào FormData
         formData.append('media', JSON.stringify(mediaData));
-        
-        // Thêm từng file media vào formData
+
+        // Thêm từng file media vào FormData
         mediaArray.forEach(file => {
             formData.append(file.name, file);
         });
-    
-        // Gửi yêu cầu
-        const response = await axios.post(`${TELEGRAM_API_URL}/sendMediaGroup`, formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+
+        try {
+            const response = await axios.post(`${TELEGRAM_API_URL}/sendMediaGroup`, formData, {
+                headers: {
+                    // Axios sẽ tự động set đúng Content-Type header cho FormData
+                }
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Error sending media group:', error);
+            if (error.response) {
+                console.error('Response:', error.response);
+                console.error('Response Data:', error.response.data);
+                console.error('Response Status:', error.response.status);
+            } else if (error.request) {
+                console.error('No response received:', error.request);
+            } else {
+                console.error('Error setting up the request:', error.message);
             }
-        });
-        return response.data;
+            throw error;
+        }
     },
-    
+
+
 
     // Hàm gửi tin nhắn đến Telegram channel
     sendMessageToTelegramChannel: async (channelId, messageText, format) => {
-        const response = await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
+        try {
+          const response = await axios.post(`${TELEGRAM_API_URL}/sendMessage`, {
             chat_id: channelId,
             text: messageText,
-            parse_mode: format // Thêm dòng này
-        });
-        return response.data;
-    },
-
+            parse_mode: format
+          });
+          return response.data;
+        } catch (error) {
+          console.error('Error sending message:', error);
+          // Có thể bạn muốn xử lý lỗi chi tiết hơn tại đây
+          throw error; // Hoặc xử lý lỗi theo một cách khác tuỳ thuộc vào logic của bạn
+        }
+      },
+      
     addChannel: async (channelData) => {
         const response = await axios.post(CHANNEL_API, channelData);
         return response.data;
