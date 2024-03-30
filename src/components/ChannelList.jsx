@@ -22,15 +22,36 @@ function ChannelList() {
 
   // console.log("ChannelList: ", channels);
   return (
-    <ul>
-      {channels.map((channel) => (
-        <li key={channel.id}>
-          Number: {channel.channel_number}, ID: {channel.channel_id}, Name: {channel.channel_name}
-          <button onClick={() => handleEdit(channel.id)}>Edit</button>
-          <button onClick={() => handleDelete(channel.id)}>Delete</button>
-        </li>
-      ))}
-    </ul>
+    <div className="table-responsive small">
+      <table className="table table-striped table-sm">
+        <thead>
+          <tr>
+            <th scope="col">No.</th>
+            <th scope="col">ID</th>
+            <th scope="col">Name</th>
+            <th scope="col">Link</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {channels.map((channel, index) => (
+            <tr key={channel.id}>
+              <td>{index + 1}</td>
+              <td>{channel.channel_id}</td>
+              <td>{channel.channel_name}</td>
+              <td>{/* Hiển thị link nếu có */}</td>
+              <td>
+                <div>
+                  <button type="button" className="btn btn-primary btn-sm" onClick={() => handleEdit(channel.id)}>Edit</button>
+                  <span> </span>
+                  <button type="button" className="btn btn-danger btn-sm" onClick={() => handleDelete(channel.id)}>Remove</button>
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 

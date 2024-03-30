@@ -6,7 +6,7 @@ import axios from 'axios';
 const BOT_TOKEN = '6952515983:AAHYtunwvxyA_iGQ3tFcWcsILRSRAMEWI1I';
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
-const CHANNEL_API = 'https://660537b52ca9478ea17fb81f.mockapi.io/TTG/Channels'
+const CHANNEL_API = 'https://6601e3599d7276a755525496.mockapi.io/channels'
 
 console.log("BOT_TOKEN: ", BOT_TOKEN);
 console.log("TELEGRAM_API_URL: ", TELEGRAM_API_URL);

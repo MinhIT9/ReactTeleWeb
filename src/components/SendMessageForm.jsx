@@ -16,21 +16,7 @@ function SendMessageForm() {
     event.preventDefault();
     setIsLoading(true);
 
-    // Xử lý tin nhắn chỉ có văn bản
-    if (mediaFiles.length > 0) {
-      try {
-        const response = await apiService.sendMediaGroupToTelegramChannel(
-          channelId, // ID của kênh
-          mediaFiles, // Mảng các file media
-          cleanMessage(message) // Tin nhắn sẽ được đính kèm với media đầu tiên
-        );
-        console.log(response);
-        alert("Media sent successfully!");
-      } catch (error) {
-        console.error(error);
-        alert("Failed to send media: " + error.message);
-      }
-    } else {
+    if (mediaFiles && mediaFiles.length > 0) {
       // Xử lý gửi tin nhắn có kèm theo media
       const formData = new FormData();
       formData.append('chat_id', channelId);
@@ -45,17 +31,37 @@ function SendMessageForm() {
       });
 
       try {
-        const response = await apiService.sendMediaGroupToTelegramChannel(formData);
+        const response = await apiService.sendMediaGroupToTelegramChannel(
+          channelId,
+          mediaFiles, // Đảm bảo rằng đây là một mảng các file
+          cleanMessage(message)
+        );
         console.log(response);
-        // alert("Media sent successfully!");
+        alert("Media sent successfully!");
       } catch (error) {
         console.error(error);
         alert("Failed to send media: " + error.message);
       }
+    } else {
+
+      // Thêm phần này để xử lý gửi tin nhắn văn bản khi không có media files
+      try {
+        const response = await apiService.sendMessageToTelegramChannel(
+          channelId,
+          cleanMessage(message),
+          'HTML' // Hoặc 'Markdown' tùy vào cách bạn muốn format tin nhắn
+        );
+        console.log(response);
+        alert("Message sent successfully!");
+      } catch (error) {
+        console.error(error);
+        alert("Failed to send message: " + error.message);
+      }
+
     }
 
     // Reset trạng thái
-    setMessage("");
+    // setMessage("");
     // setChannelId("");
     setMediaFiles([]);
     setIsLoading(false);
