@@ -5,7 +5,7 @@ import { Link } from "react-router-dom"
 export const Header = () => {
     return (
         <header className="navbar sticky-top bg-dark flex-md-nowrap p-0 shadow" data-bs-theme="dark">
-            <Link className="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" to="/">Company name</Link>
+            <Link className="navbar-brand col-md-3 col-lg-2 me-0 px-3 fs-6 text-white" to="/">System Telegram PRO</Link>
             <ul className="navbar-nav flex-row d-md-none">
                 <li className="nav-item text-nowrap">
                     <button className="nav-link px-3 text-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSearch" aria-controls="navbarSearch" aria-expanded="false" aria-label="Toggle search">
