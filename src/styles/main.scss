@@ -1,0 +1,22 @@
+// main.scss
+
+// Utils
+@import "utils/variables";
+@import "utils/mixins";
+@import "utils/functions";
+
+// Base
+@import "base/reset";
+@import "base/base";
+
+// Components
+@import "components/button";
+@import "components/card";
+
+// Layout
+@import "layout/header";
+@import "layout/sidebar";
+
+// Pages
+@import "pages/channelPage";
+@import "pages/dashboard";
