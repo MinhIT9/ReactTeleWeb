@@ -1,40 +1,39 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import SendMessageForm from './components/SendMessageForm'
+// src/services/app.jsx
+import "./styles/main.scss";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Sidebars } from "./Components/Layouts/Sidebars";
+import { Header } from "./Components/Layouts/Header";
+import ChannelsPage from "./pages/ChannelsPage";
+import MessagePage from "./pages/MessagesPage";
+import { Dashboard } from "./pages/Dashboard";
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <div className="App">
-        <h1>Send Message to Channel</h1>
-        <SendMessageForm />
+     <Router>
+ <Header />
+
+      <div className="container-fluid">
+        <div className="row">
+
+          <Sidebars />
+
+          <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/manage-channels" element={<ChannelsPage />} />
+              <Route path="/manage-message" element={< MessagePage />} />
+              {/* Thêm các route khác tại đây */}
+            </Routes>
+          </main>
+        </div>
       </div>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+     </Router>
+     
+
     </>
-  )
+  );
 }
 
-export default App
+export default App;

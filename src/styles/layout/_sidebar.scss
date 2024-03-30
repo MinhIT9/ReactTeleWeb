@@ -1,0 +1,33 @@
+/*
+ * src/styles/layout/_sidebar.scss
+ */
+
+// src/styles/components/_sidebars.scss
+
+#sidebars_cus {
+    .offcanvas-lg {
+        @media (min-width: 768px) {
+            position: sticky;
+            top: 48px;
+        }
+    }
+
+    .navbar-search {
+        @media (min-width: 768px) {
+            display: block;
+        }
+    }
+
+    .nav-link {
+        font-size: .875rem;
+        font-weight: 500;
+
+        &.active {
+            color: #2470dc;
+        }
+    }
+
+    .sidebar-heading {
+        font-size: .75rem;
+    }
+}

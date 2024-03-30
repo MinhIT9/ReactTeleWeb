@@ -8,27 +8,68 @@ function SendMessageForm() {
   const [message, setMessage] = useState(""); // Nên giữ tên biến này là message để khớp với state
   const [channelId, setChannelId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [mediaFiles, setMediaFiles] = useState([]); // Lưu trữ mảng các file media
 
+
+  // Trong SendMessageForm, khi chuẩn bị dữ liệu để gửi
   const handleSendMessage = async (event) => {
     event.preventDefault();
     setIsLoading(true);
-    try {
-      await apiService.sendMessageToTelegramChannel(
-        channelId,
-        cleanMessage(message),
-        "HTML"
-      );
-      alert("Message sent successfully to Telegram Channel!");
-      setMessage(""); // Reset state
-      setChannelId("");
-    } catch (error) {
-      alert(
-        "Failed to send message to Telegram Channel: " + error.message
-      );
-    } finally {
-      setIsLoading(false);
+
+    if (mediaFiles && mediaFiles.length > 0) {
+      // Xử lý gửi tin nhắn có kèm theo media
+      const formData = new FormData();
+      formData.append('chat_id', channelId);
+      const mediaData = mediaFiles.map((file, index) => ({
+        type: file.type.startsWith('image/') ? 'photo' : 'video',
+        media: 'attach://' + file.name,
+        caption: index === 0 ? cleanMessage(message) : undefined
+      }));
+      formData.append('media', JSON.stringify(mediaData));
+      mediaFiles.forEach((file) => {
+        formData.append(file.name, file);
+      });
+
+      try {
+        const response = await apiService.sendMediaGroupToTelegramChannel(
+          channelId,
+          mediaFiles, // Đảm bảo rằng đây là một mảng các file
+          cleanMessage(message)
+        );
+        console.log(response);
+        alert("Media sent successfully!");
+      } catch (error) {
+        console.error(error);
+        alert("Failed to send media: " + error.message);
+      }
+    } else {
+
+      // Thêm phần này để xử lý gửi tin nhắn văn bản khi không có media files
+      try {
+        const response = await apiService.sendMessageToTelegramChannel(
+          channelId,
+          cleanMessage(message),
+          'HTML' // Hoặc 'Markdown' tùy vào cách bạn muốn format tin nhắn
+        );
+        console.log(response);
+        alert("Message sent successfully!");
+      } catch (error) {
+        console.error(error);
+        alert("Failed to send message: " + error.message);
+      }
+
     }
+
+    // Reset trạng thái
+    // setMessage("");
+    // setChannelId("");
+    setMediaFiles([]);
+    setIsLoading(false);
   };
+
+
+
+
 
   const modules = {
     toolbar: [
@@ -47,8 +88,15 @@ function SendMessageForm() {
   };
 
   const cleanMessage = (html) => {
-    return html.replace(/<\/?p[^>]*>/g, "");
+    // Thay thế các thẻ <br> bằng newline
+    let cleanHtml = html.replace(/<br\s*[/]?>/gi, '');
+    // Thay thế các thẻ <p> bằng newline và xóa các thẻ </p>
+    cleanHtml = cleanHtml.replace(/<p>/gi, '\n').replace(/<\/p>/gi, '');
+    // Cắt khoảng trắng thừa ở đầu và cuối chuỗi
+    cleanHtml = cleanHtml.trim();
+    return cleanHtml;
   };
+
 
   return (
     <form onSubmit={handleSendMessage}>
@@ -66,6 +114,20 @@ function SendMessageForm() {
         />
       </div>
       <div className="mb-3">
+        <label htmlFor="media" className="form-label">
+          Media Files:
+        </label>
+        <input
+          type="file"
+          className="form-control"
+          id="media"
+          multiple
+          onChange={(e) => setMediaFiles(Array.from(e.target.files))}
+        />
+      </div>
+
+
+      <div className="mb-3">
         <label htmlFor="message" className="form-label">
           Message:
         </label>
@@ -75,6 +137,8 @@ function SendMessageForm() {
           modules={modules}
         />
       </div>
+
+
       <button
         type="submit"
         className="btn btn-primary"

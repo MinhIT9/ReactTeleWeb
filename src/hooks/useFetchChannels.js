@@ -1,8 +1,8 @@
 // src/hooks/useFetchChannels.js
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from 'react';
 import { apiService } from '../services/apiService';
 
-export const useFetchChannels = () => {
+export function useFetchChannels() {
   const [channels, setChannels] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -11,12 +11,11 @@ export const useFetchChannels = () => {
     const fetchChannels = async () => {
       setLoading(true);
       try {
-        const response = await apiService.fetchChannels();
-        setChannels(response.data);
-        setError(null);
+        const data = await apiService.getChannels();
+        // console.log("data_ChannelsAPI: ", data);
+        setChannels(data);
       } catch (err) {
         setError(err);
-        setChannels([]);
       } finally {
         setLoading(false);
       }
@@ -25,5 +24,10 @@ export const useFetchChannels = () => {
     fetchChannels();
   }, []);
 
+  // Log để kiểm tra
+  // console.log('Channels from hook:', channels);
+  // console.log('Loading status:', loading);
+  // console.log('Error:', error);
+
   return { channels, loading, error };
-};
+}
