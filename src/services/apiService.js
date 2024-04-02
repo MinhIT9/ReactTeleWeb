@@ -2,8 +2,11 @@
 
 import axios from 'axios';
 
-// Các biến môi trường
+// Các biến môi trườngA
 const BOT_TOKEN = '6952515983:AAHYtunwvxyA_iGQ3tFcWcsILRSRAMEWI1I';
+
+export const API_AUTH_URL = "https://66069142be53febb857e308e.mockapi.io/Users";
+
 const TELEGRAM_API_URL = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
 const CHANNEL_API = 'https://6601e3599d7276a755525496.mockapi.io/channels'
@@ -13,11 +16,32 @@ console.log("TELEGRAM_API_URL: ", TELEGRAM_API_URL);
 console.log("CHANNEL_API: ", CHANNEL_API);
 
 export const apiService = {
+    addUser: async (userData) => {
+        const response = await axios.post(API_AUTH_URL, userData);
+        return response.data;
+    },
+    // Cập nhật người dùng
+    updateUser: async (userId, userData) => {
+        const response = await axios.put(`${API_AUTH_URL}/${userId}`, userData);
+        return response.data;
+    },
+    // Xóa người dùng
+    deleteUser: async (userId) => {
+        const response = await axios.delete(`${API_AUTH_URL}/${userId}`);
+        return response.data;
+    },
+    // Lấy người dùng
+    getUsers: async () => {
+        const response = await axios.get(`${API_AUTH_URL}`);
+        return response.data;
+    },
+
+
     // Hàm gửi nhóm media đến Telegram channel
     sendMediaGroupToTelegramChannel: async (channelId, mediaArray, caption = '') => {
         const formData = new FormData();
         formData.append('chat_id', channelId);
-    
+
         // Tạo một mảng chứa các đối tượng media với caption cho media đầu tiên
         const mediaData = mediaArray.map((file, index) => ({
             type: file.type.startsWith('image/') ? 'photo' : 'video',
@@ -26,15 +50,15 @@ export const apiService = {
             caption: index === 0 ? caption : undefined,
             parse_mode: 'HTML' // Hoặc Markdown, tùy thuộc vào định dạng của bạn
         }));
-    
+
         // Thêm dữ liệu media vào formData
         formData.append('media', JSON.stringify(mediaData));
-        
+
         // Thêm từng file media vào formData
         mediaArray.forEach(file => {
             formData.append(file.name, file);
         });
-    
+
         // Gửi yêu cầu
         const response = await axios.post(`${TELEGRAM_API_URL}/sendMediaGroup`, formData, {
             headers: {
@@ -43,7 +67,7 @@ export const apiService = {
         });
         return response.data;
     },
-    
+
 
     // Hàm gửi tin nhắn đến Telegram channel
     sendMessageToTelegramChannel: async (channelId, messageText, format) => {

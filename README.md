@@ -10,3 +10,5 @@
 
 
 -------Version 1.0-------
+- Thêm chức năng Login/Register với role Admin/User: Mặc định khi register role:user, role:pending
+- Page quản lý User: Xoá/Sửa

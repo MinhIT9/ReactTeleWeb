@@ -1,0 +1,45 @@
+Dùng tiếng việt hỗ trợ tôi, tôi sẽ cung cấp cho bạn các file của tôi và hình ảnh. sau cùng tôi sẽ nói mục đích cần hỗ trợ
+Dự án của tôi: Xây dựng web app bot telegram kết hợp mockapi.io, sử dụng React + Vite+ Bootstrap 5.3 + fontawsome 6.5.1, chức năng:
+- Web dành cho nhiều người sử dụng: 
++ Tài khoản admin dùng để quản lý các user khác
++ Tài khoản khách ko có quyền quản lý user khác, có thể reset password qua email
+Tài khoản admin và khách đều có thể làm các chức năng sau:
+- Gửi tin nhắn đến nhiều Channels, sửa, xoá tin nhắn
+- Quản lý Channels: CRUD Channels
+- Quản lý TokenBot: CRUD TokenBOT
+
+Hãy giúp tôi xây dựng chức năng login + register cho khách hàng, chi tiết từng cách làm
+- Register thành công sẽ thông báo lên giao diện của admin chờ duyệt
+
+----------
+Dựa vào stack công nghệ của bạn (React, Vite, Bootstrap 5.3, Font Awesome 6.5.1), bạn sẽ cần thực hiện các bước sau để tạo chức năng đăng nhập và đăng ký.
+
+Bước 1: Thiết kế Giao diện (Front-end)
+Đăng Ký và Đăng Nhập:
+
+Sử dụng Bootstrap để thiết kế hai biểu mẫu đơn giản cho đăng ký và đăng nhập. Font Awesome có thể được sử dụng cho các biểu tượng trên nút hoặc trường nhập liệu.
+Biểu mẫu đăng ký nên có các trường: tên người dùng, email, mật khẩu và xác nhận mật khẩu.
+Biểu mẫu đăng nhập chỉ cần email và mật khẩu.
+Thông báo cho Admin:
+
+Thiết kế một thành phần thông báo trong giao diện quản trị để hiển thị thông tin về người dùng mới đang chờ xác nhận.
+Bước 2: Xây dựng Backend (Node.js/Express.js)
+Thiết lập một API để xử lý đăng ký người dùng. Đối với mỗi người dùng mới, lưu trữ thông tin của họ trong một cơ sở dữ liệu (có thể sử dụng MongoDB, MySQL, Postgres, v.v.) với trạng thái 'pending' cho đến khi được admin xác nhận.
+Tạo một endpoint để admin có thể xác nhận người dùng.
+Bước 3: Tạo Authentication (Xác thực)
+Sử dụng JWT (JSON Web Tokens) hoặc một thư viện tương tự như Passport.js để xử lý xác thực và phiên làm việc.
+Khi người dùng đăng nhập, hệ thống sẽ tạo một token và gửi lại cho họ để sử dụng trong việc xác thực các yêu cầu tiếp theo.
+Bước 4: Xử lý Phê duyệt của Admin
+Trong giao diện quản trị, hiển thị danh sách người dùng đang chờ duyệt. Admin có thể xác nhận hoặc từ chối hồ sơ từ đây.
+Bước 5: Tích hợp Front-end và Back-end
+Sử dụng Axios hoặc Fetch API để gọi các endpoint API từ giao diện người dùng.
+Xử lý phản hồi từ API và hiển thị thông báo phù hợp cho người dùng (thông báo thành công, lỗi, chờ xác nhận, v.v.).
+Bước 6: Authorization (Ủy quyền)
+Sau khi đăng nhập, kiểm tra vai trò của người dùng (admin hoặc khách) để cung cấp quyền truy cập vào các chức năng khác nhau. Ví dụ, chỉ admin mới có thể xem và xử lý yêu cầu đăng ký mới.
+Bước 7: Security (Bảo mật)
+Đảm bảo rằng mật khẩu được hash trước khi lưu vào cơ sở dữ liệu.
+Sử dụng HTTPS để bảo vệ thông tin người dùng.
+Bước 8: Deployment (Triển khai)
+Triển khai ứng dụng của bạn lên một server thực tế. Bạn có thể sử dụng các dịch vụ như Heroku, AWS, hoặc Vercel.
+Nhớ rằng việc xây dựng chức năng đăng nhập và đăng ký cần phải tập trung vào bảo mật thông tin người dùng và quản lý phiên làm việc một cách chặt chẽ.
+

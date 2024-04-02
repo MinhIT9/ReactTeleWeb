@@ -1,6 +1,6 @@
 // src/hooks/useChannels.js
 import { useContext } from 'react';
-import { ChannelsContext } from '../Contexts/ChannelsContext';
+import { ChannelsContext } from '../context/ChannelsContext';
 
 export const useChannels = () => {
   const context = useContext(ChannelsContext);

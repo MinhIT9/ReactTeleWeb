@@ -1,8 +1,20 @@
 // src/Components/Layouts/Sidebar.jsx
 
-import { Link } from 'react-router-dom';
+import { useContext } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../context/AuthContext'; // Đảm bảo đường dẫn đến AuthContext đúng
+
 
 export const Sidebars = () => {
+    const { setAuthData } = useContext(AuthContext);
+    const navigate = useNavigate(); // Thêm này nếu chưa có
+
+    const handleLogout = () => {
+        setAuthData(null); // Xóa dữ liệu xác thực khỏi context
+        localStorage.removeItem('authData'); // Xóa token từ localStorage
+        navigate('/'); // Redirect người dùng tới trang đăng nhập
+    };
+
     return (
         <div id='sidebars_cus' className="sidebar border border-right col-md-3 col-lg-2 p-0 bg-body-tertiary">
             <div className="offcanvas-md offcanvas-end bg-body-tertiary" tabIndex={-1} id="sidebarMenu" aria-labelledby="sidebarMenuLabel">
@@ -37,10 +49,10 @@ export const Sidebars = () => {
                             </a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link d-flex align-items-center gap-2" href="#">
-                                <i className="fa-solid fa-chart-simple"></i>
-                                Reports
-                            </a>
+                            <Link className="nav-link d-flex align-items-center gap-2" to="/user-management">
+                                <i className="fa-sharp fa-solid fa-list" />
+                                Quản Lý Tài Khoản
+                            </Link>
                         </li>
                     </ul>
                     <h6 className="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-body-secondary text-uppercase">
@@ -84,10 +96,11 @@ export const Sidebars = () => {
                             </a>
                         </li>
                         <li className="nav-item">
-                            <a className="nav-link d-flex align-items-center gap-2" href="#">
+                            <button className="nav-link d-flex align-items-center gap-2" onClick={handleLogout}>
                                 <i className="fa-solid fa-door-closed"></i>
-                                Sign out
-                            </a>
+                                Đăng xuất
+                            </button>
+
                         </li>
                     </ul>
                 </div>
